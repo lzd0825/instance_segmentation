@@ -39,8 +39,8 @@ import caffe # If you get "No module named _caffe", either you have not built py
 
 from caffe import layers as L, params as P # Shortcuts to define the net prototxt.
 
-sys.path.append(caffe_root + "examples/pycaffe/layers") # the datalayers we will use are in this directory.
-sys.path.append(caffe_root + "examples/pycaffe") # the tools file is in this folder
+# sys.path.append(caffe_root + "examples/pycaffe/layers") # the datalayers we will use are in this directory.
+# sys.path.append(caffe_root + "examples/pycaffe") # the tools file is in this folder
 
 import tools #this contains some tools that we need
 
@@ -221,12 +221,12 @@ print 'Baseline accuracy:{0:.4f}'.format(check_baseline_accuracy(solver.test_net
 
 # In[39]:
 
-test_net = solver.test_nets[0]
-for image_index in range(5):
-    plt.figure()
-    plt.imshow(transformer.deprocess(copy(test_net.blobs['data'].data[image_index, ...])))
-    gtlist = test_net.blobs['label'].data[image_index, ...].astype(np.int)
-    estlist = test_net.blobs['score'].data[image_index, ...] > 0
-    plt.title('GT: {} \n EST: {}'.format(classes[np.where(gtlist)], classes[np.where(estlist)]))
-    plt.axis('off')
+# test_net = solver.test_nets[0]
+# for image_index in range(5):
+#     plt.figure()
+#     plt.imshow(transformer.deprocess(copy(test_net.blobs['data'].data[image_index, ...])))
+#     gtlist = test_net.blobs['label'].data[image_index, ...].astype(np.int)
+#     estlist = test_net.blobs['score'].data[image_index, ...] > 0
+#     plt.title('GT: {} \n EST: {}'.format(classes[np.where(gtlist)], classes[np.where(estlist)]))
+#     plt.axis('off')
 
