@@ -60,11 +60,11 @@ class PascalSegmentationDataLayerSync(caffe.Layer):
         """
         for itt in range(self.batch_size):
             # Use the batch loader to load the next image.
-            im, multilabel = self.batch_loader.load_next_image()
+            im, seg = self.batch_loader.load_next_image()
 
             # Add directly to the caffe data layer
             top[0].data[itt, ...] = im
-            top[1].data[itt, ...] = multilabel
+            top[1].data[itt, ...] = seg
 
     def reshape(self, bottom, top):
         """
@@ -101,6 +101,7 @@ class BatchLoader(object):
         self._cur = 0  # current image
         # this class does some simple data-manipulations
         self.transformer = SimpleTransformer()
+        self.nclasses = 20 + 1
 
         print "BatchLoader initialized with {} images".format(
             len(self.indexlist))
@@ -121,19 +122,30 @@ class BatchLoader(object):
             osp.join(self.pascal_root, 'JPEGImages', image_file_name)))
         im = scipy.misc.imresize(im, self.im_shape)  # resize
 
+        # Load and prepare ground truth segmentation
+        segment_file_name = index + '.png'
+        seg = np.asarray(Image.open(
+            osp.join(self.pascal_root, 'SegmentationClass', segment_file_name)))
+        seg = scipy.misc.imresize(seg, self.im_shape, 'nearest')
+
         # do a simple horizontal flip as data augmentation
         flip = np.random.choice(2)*2-1
         im = im[:, ::flip, :]
+        seg = seg[::flip, :]
 
         # Load and prepare ground truth
-        multilabel = np.zeros(20).astype(np.float32)
-        anns = load_pascal_annotation(index, self.pascal_root)
-        for label in anns['gt_classes']:
+        multilabel = np.zeros(self.nclasses, self.im_shape[0], self.im_shape[1]).astype(np.float32)
+        # anns = load_pascal_annotation(index, self.pascal_root)
+        # for label in anns['gt_classes']:
+        for label in xrange(21):
             # in the multilabel problem we don't care how MANY instances
             # there are of each class. Only if they are present.
             # The "-1" is b/c we are not interested in the background
             # class.
-            multilabel[label - 1] = 1
+            # multilabel[label - 1] = 1
+            seg_mask = np.zeros(self.im_shape[0], self.im_shape[1]).astype(np.float32)
+            seg_mask[seg == label] = 1
+            multilabel[label, :, :] = seg_mask
 
         self._cur += 1
         return self.transformer.preprocess(im), multilabel
@@ -216,3 +228,10 @@ def print_info(name, params):
         params['split'],
         params['batch_size'],
         params['im_shape'])
+
+if __name__ == '__main__':
+    pascal_root = '/media/yi/DATA/data-orig/VOCdevkit/VOC2012'
+    params = dict(batch_size=128, im_shape=[227, 227], split='train',
+                             pascal_root=pascal_root)
+    batch_loader = BatchLoader(params, None)
+    im, seg = batch_loader.load_next_image()
