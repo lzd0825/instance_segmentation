@@ -26,7 +26,7 @@ class PascalSegmentationDataLayerSync(caffe.Layer):
 
     def setup(self, bottom, top):
 
-        self.top_names = ['data', 'label']
+        self.top_names = ['data', 'label', 'label1', 'label2', 'label3']
 
         # === Read input parameters ===
 
@@ -50,7 +50,7 @@ class PascalSegmentationDataLayerSync(caffe.Layer):
         # Note the 20 channels (because PASCAL has 20 classes.)
         # top[1].reshape(self.batch_size, 20)
         top[1].reshape(
-            self.batch_size, 20, params['im_shape'][0], params['im_shape'][1])
+            self.batch_size, 1, params['im_shape'][0]/32, params['im_shape'][1]/32)
 
         print_info("PascalSegmentationDataLayerSync", params)
 
@@ -101,7 +101,6 @@ class BatchLoader(object):
         self._cur = 0  # current image
         # this class does some simple data-manipulations
         self.transformer = SimpleTransformer()
-        self.nclasses = 20 + 1
 
         print "BatchLoader initialized with {} images".format(
             len(self.indexlist))
@@ -150,8 +149,8 @@ class BatchLoader(object):
         # seg_mask = np.zeros((self.im_shape[0], self.im_shape[1])).astype(np.float32)
         # seg_mask[seg == 255] = 1
         # label_map[0, :, :] += seg_mask
-        label_map = seg
-        # print seg
+        label_map = scipy.misc.imresize(seg, (seg.shape[0]/32, seg.shape[1]/32), 'nearest')
+        # print label_map.shape
 
         self._cur += 1
         return self.transformer.preprocess(im), label_map
@@ -237,7 +236,7 @@ def print_info(name, params):
 
 if __name__ == '__main__':
     pascal_root = '/media/yi/DATA/data-orig/VOCdevkit/VOC2012'
-    params = dict(batch_size=128, im_shape=[16, 16], split='train',
+    params = dict(batch_size=128, im_shape=[256, 256], split='train',
                              pascal_root=pascal_root)
     batch_loader = BatchLoader(params, None)
     im, seg = batch_loader.load_next_image()
