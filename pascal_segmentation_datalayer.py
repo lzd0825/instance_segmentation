@@ -50,7 +50,7 @@ class PascalSegmentationDataLayerSync(caffe.Layer):
         # Note the 20 channels (because PASCAL has 20 classes.)
         # top[1].reshape(self.batch_size, 20)
         top[1].reshape(
-            self.batch_size, 20, params['im_shape'[0], params['im_shape'][1])
+            self.batch_size, 20, params['im_shape'][0], params['im_shape'][1])
 
         print_info("PascalSegmentationDataLayerSync", params)
 
@@ -97,7 +97,7 @@ class BatchLoader(object):
         # get list of image indexes.
         list_file = params['split'] + '.txt'
         self.indexlist = [line.rstrip('\n') for line in open(
-            osp.join(self.pascal_root, 'ImageSets/Main', list_file))]
+            osp.join(self.pascal_root, 'ImageSets/Segmentation', list_file))]
         self._cur = 0  # current image
         # this class does some simple data-manipulations
         self.transformer = SimpleTransformer()
@@ -131,24 +131,30 @@ class BatchLoader(object):
         # do a simple horizontal flip as data augmentation
         flip = np.random.choice(2)*2-1
         im = im[:, ::flip, :]
-        seg = seg[::flip, :]
+        seg = seg[:, ::flip]
 
         # Load and prepare ground truth
-        multilabel = np.zeros(self.nclasses, self.im_shape[0], self.im_shape[1]).astype(np.float32)
+        # label_map = np.zeros((self.nclasses, self.im_shape[0], self.im_shape[1])).astype(np.float32)
         # anns = load_pascal_annotation(index, self.pascal_root)
         # for label in anns['gt_classes']:
-        for label in xrange(21):
-            # in the multilabel problem we don't care how MANY instances
+        # for label in xrange(21):
+            # in the label_map problem we don't care how MANY instances
             # there are of each class. Only if they are present.
             # The "-1" is b/c we are not interested in the background
             # class.
-            # multilabel[label - 1] = 1
-            seg_mask = np.zeros(self.im_shape[0], self.im_shape[1]).astype(np.float32)
-            seg_mask[seg == label] = 1
-            multilabel[label, :, :] = seg_mask
+            # label_map[label - 1] = 1
+        #    seg_mask = np.zeros((self.im_shape[0], self.im_shape[1])).astype(np.float32)
+        #    seg_mask[seg == label] = 1
+        #    label_map[label, :, :] = seg_mask
+        #    print label_map[label, :, :]
+        # seg_mask = np.zeros((self.im_shape[0], self.im_shape[1])).astype(np.float32)
+        # seg_mask[seg == 255] = 1
+        # label_map[0, :, :] += seg_mask
+        label_map = seg
+        # print seg
 
         self._cur += 1
-        return self.transformer.preprocess(im), multilabel
+        return self.transformer.preprocess(im), label_map
 
 
 def load_pascal_annotation(index, pascal_root):
@@ -231,7 +237,11 @@ def print_info(name, params):
 
 if __name__ == '__main__':
     pascal_root = '/media/yi/DATA/data-orig/VOCdevkit/VOC2012'
-    params = dict(batch_size=128, im_shape=[227, 227], split='train',
+    params = dict(batch_size=128, im_shape=[16, 16], split='train',
                              pascal_root=pascal_root)
     batch_loader = BatchLoader(params, None)
+    im, seg = batch_loader.load_next_image()
+    im, seg = batch_loader.load_next_image()
+    im, seg = batch_loader.load_next_image()
+    im, seg = batch_loader.load_next_image()
     im, seg = batch_loader.load_next_image()
