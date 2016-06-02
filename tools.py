@@ -69,8 +69,8 @@ class CaffeSolver:
         self.sp['momentum'] = '0.9'
 
         # speed:
-        self.sp['test_iter'] = '100'
-        self.sp['test_interval'] = '250'
+        self.sp['test_iter'] = '5'
+        self.sp['test_interval'] = '100'
 
         # looks:
         self.sp['display'] = '25'
