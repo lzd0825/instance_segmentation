@@ -8,7 +8,7 @@ class SimpleTransformer:
     images for caffe.
     """
 
-    def __init__(self, mean=[128, 128, 128]):
+    def __init__(self, mean=[104, 117, 123]):
         self.mean = np.array(mean, dtype=np.float32)
         self.scale = 1.0
 
@@ -29,7 +29,6 @@ class SimpleTransformer:
         preprocess() emulate the pre-processing occuring in the vgg16 caffe
         prototxt.
         """
-
         im = np.float32(im)
         im = im[:, :, ::-1]  # change to BGR
         im -= self.mean
