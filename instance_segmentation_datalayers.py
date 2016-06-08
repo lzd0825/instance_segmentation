@@ -130,31 +130,31 @@ class BatchLoader(object):
         im = im[:, ::flip, :]
         seg = seg[:, ::flip]
 
-        # Load and prepare ground truth
-        start = time.time()
-        label_map_org = np.zeros((self.im_shape[0], self.im_shape[1])).astype(np.float32)
-        label_map_org[seg == 255] = 255
-        maxlabel = np.max(seg[seg < 255])
-        centroids = np.zeros((maxlabel, 2)).astype(np.float32)
-        npts = np.zeros((maxlabel, 1)).astype(np.float32)
-        for y in range(self.im_shape[0]):
-            for x in range(self.im_shape[1]):
-                label = seg[y, x]
-                if 0 < label < 255:
-                    centroids[label - 1, :] += [y, x]
-                    npts[label - 1] += 1
+        # # Load and prepare ground truth
+        # start = time.time()
+        # label_map_org = np.zeros((self.im_shape[0], self.im_shape[1])).astype(np.float32)
+        # label_map_org[seg == 255] = 255
+        # maxlabel = np.max(seg[seg < 255])
+        # centroids = np.zeros((maxlabel, 2)).astype(np.float32)
+        # npts = np.zeros((maxlabel, 1)).astype(np.float32)
+        # for y in range(self.im_shape[0]):
+        #     for x in range(self.im_shape[1]):
+        #         label = seg[y, x]
+        #         if 0 < label < 255:
+        #             centroids[label - 1, :] += [y, x]
+        #             npts[label - 1] += 1
 
-        for label in range(maxlabel):
-            # assign an id based on centroid
-            if npts[label] > 0:
-                centroids[label, :] /= npts[label] * 32
-                label_map_org[seg == label + 1] = int(round(centroids[label, 0])) * 8 + int(round(centroids[label, 1])) + 1
-        label_map = scipy.misc.imresize(label_map_org, self.seg_shape, 'nearest')
-        end = time.time()
-        print end - start
+        # for label in range(maxlabel):
+        #     # assign an id based on centroid
+        #     if npts[label] > 0:
+        #         centroids[label, :] /= npts[label] * 32
+        #         label_map_org[seg == label + 1] = int(round(centroids[label, 0])) * 8 + int(round(centroids[label, 1])) + 1
+        # label_map = scipy.misc.imresize(label_map_org, self.seg_shape, 'nearest')
+        # end = time.time()
+        # print end - start
 
         # Load and prepare ground truth
-        start = time.time()
+        # start = time.time()
         label_map_org = np.zeros((self.im_shape[0], self.im_shape[1])).astype(np.int)
         label_map_org[seg == 255] = 255
         maxlabel = np.max(seg[seg < 255])
@@ -172,8 +172,8 @@ class BatchLoader(object):
             label_map_org[seg == label + 1] = int(round(centroids[label, 0])) * 8 + int(
                 round(centroids[label, 1])) + 1
         label_map = scipy.misc.imresize(label_map_org, self.seg_shape, 'nearest')
-        end = time.time()
-        print end - start
+        # end = time.time()
+        # print end - start
         # print label_map.shape
 
         self._cur += 1
