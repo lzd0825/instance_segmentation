@@ -26,7 +26,7 @@ class PascalSegmentationDataLayerSync(caffe.Layer):
 
     def setup(self, bottom, top):
 
-        self.top_names = ['data', 'label', 'label1', 'label2', 'label3']
+        self.top_names = ['data', 'label']
 
         # === Read input parameters ===
 
