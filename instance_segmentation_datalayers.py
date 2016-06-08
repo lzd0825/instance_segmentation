@@ -158,18 +158,26 @@ class BatchLoader(object):
         label_map_org = np.zeros((self.im_shape[0], self.im_shape[1])).astype(np.int)
         label_map_org[seg == 255] = 255
         maxlabel = np.max(seg[seg < 255])
+        unique_labels = np.unique(seg[seg < 255])
         centroids = np.zeros((maxlabel, 2)).astype(np.float32)
         x_coords = np.tile(np.arange(self.im_shape[1]), (self.im_shape[0], 1))
         y_coords = np.tile(np.arange(self.im_shape[0]).reshape((self.im_shape[0], 1)), (1, self.im_shape[1]))
-        for label in range(maxlabel):
+        # for label in range(maxlabel):
+        for label in unique_labels:
+            if label == 0:
+                continue
             mask = np.zeros((self.im_shape[0], self.im_shape[1])).astype(np.float32)
-            mask[seg == label + 1] = 1
+            # mask[seg == label + 1] = 1
+            mask[seg == label] = 1
             center_x = np.mean(x_coords[mask == 1])
             center_y = np.mean(y_coords[mask == 1])
             centroids[label, :] = [center_y, center_x]
-        for label in range(maxlabel):
+        # for label in range(maxlabel):
+        for label in unique_labels:
+            if label == 0:
+                continue
             centroids[label, :] /= 32
-            label_map_org[seg == label + 1] = int(round(centroids[label, 0])) * 8 + int(
+            label_map_org[seg == label] = int(round(centroids[label, 0])) * 8 + int(
                 round(centroids[label, 1])) + 1
         label_map = scipy.misc.imresize(label_map_org, self.seg_shape, 'nearest')
         # end = time.time()
