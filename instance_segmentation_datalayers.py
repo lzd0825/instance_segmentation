@@ -159,7 +159,7 @@ class BatchLoader(object):
         label_map_org[seg == 255] = 255
         maxlabel = np.max(seg[seg < 255])
         unique_labels = np.unique(seg[seg < 255])
-        centroids = np.zeros((maxlabel, 2)).astype(np.float32)
+        centroids = np.zeros((maxlabel+1, 2)).astype(np.float32)
         x_coords = np.tile(np.arange(self.im_shape[1]), (self.im_shape[0], 1))
         y_coords = np.tile(np.arange(self.im_shape[0]).reshape((self.im_shape[0], 1)), (1, self.im_shape[1]))
         # for label in range(maxlabel):
