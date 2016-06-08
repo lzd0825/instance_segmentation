@@ -270,4 +270,9 @@ if __name__ == '__main__':
     im, seg = batch_loader.load_next_image()
     im, seg = batch_loader.load_next_image()
     im, seg = batch_loader.load_next_image()
+    params = dict(batch_size=128, im_shape=[256, 256], seg_shape=[8, 8], split='val',
+                  pascal_root=pascal_root)
+    batch_loader = BatchLoader(params, None)
+    im, seg = batch_loader.load_next_image()
+    im, seg = batch_loader.load_next_image()
     im, seg = batch_loader.load_next_image()
