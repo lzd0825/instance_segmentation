@@ -4,7 +4,7 @@ import time
 import pickle
 import scipy.misc
 import skimage.io
-# import caffe
+import caffe
 
 import numpy as np
 import os.path as osp
@@ -17,65 +17,65 @@ from PIL import Image
 from tools import SimpleTransformer
 
 
-# class InstanceSegmentationDataLayerSync(caffe.Layer):
-#     """
-#     This is a simple syncronous datalayer for training a instance segmentation model on
-#     PASCAL.
-#     """
-#
-#     def setup(self, bottom, top):
-#         self.top_names = ['data', 'label']
-#
-#         # === Read input parameters ===
-#
-#         # params is a python dictionary with layer parameters.
-#         params = eval(self.param_str)
-#
-#         # Check the paramameters for validity.
-#         check_params(params)
-#
-#         # store input as class variables
-#         self.batch_size = params['batch_size']
-#
-#         # Create a batch loader to load the images.
-#         self.batch_loader = BatchLoader(params, None)
-#
-#         # === reshape tops ===
-#         # since we use a fixed input image size, we can shape the data layer
-#         # once. Else, we'd have to do it in the reshape call.
-#         top[0].reshape(
-#             self.batch_size, 3, params['im_shape'][0], params['im_shape'][1])
-#         # Note the 20 channels (because PASCAL has 20 classes.)
-#         # top[1].reshape(self.batch_size, 20)
-#         top[1].reshape(
-#             self.batch_size, 1, params['seg_shape'][0], params['seg_shape'][1])
-#
-#         print_info("InstanceSegmentationDataLayerSync", params)
-#
-#     def forward(self, bottom, top):
-#         """
-#         Load data.
-#         """
-#         for itt in range(self.batch_size):
-#             # Use the batch loader to load the next image.
-#             im, seg = self.batch_loader.load_next_image()
-#
-#             # Add directly to the caffe data layer
-#             top[0].data[itt, ...] = im
-#             top[1].data[itt, ...] = seg
-#
-#     def reshape(self, bottom, top):
-#         """
-#         There is no need to reshape the data, since the input is of fixed size
-#         (rows and columns)
-#         """
-#         pass
-#
-#     def backward(self, top, propagate_down, bottom):
-#         """
-#         These layers does not back propagate
-#         """
-#         pass
+class InstanceSegmentationDataLayerSync(caffe.Layer):
+    """
+    This is a simple syncronous datalayer for training a instance segmentation model on
+    PASCAL.
+    """
+
+    def setup(self, bottom, top):
+        self.top_names = ['data', 'label']
+
+        # === Read input parameters ===
+
+        # params is a python dictionary with layer parameters.
+        params = eval(self.param_str)
+
+        # Check the paramameters for validity.
+        check_params(params)
+
+        # store input as class variables
+        self.batch_size = params['batch_size']
+
+        # Create a batch loader to load the images.
+        self.batch_loader = BatchLoader(params, None)
+
+        # === reshape tops ===
+        # since we use a fixed input image size, we can shape the data layer
+        # once. Else, we'd have to do it in the reshape call.
+        top[0].reshape(
+            self.batch_size, 3, params['im_shape'][0], params['im_shape'][1])
+        # Note the 20 channels (because PASCAL has 20 classes.)
+        # top[1].reshape(self.batch_size, 20)
+        top[1].reshape(
+            self.batch_size, 1, params['seg_shape'][0], params['seg_shape'][1])
+
+        print_info("InstanceSegmentationDataLayerSync", params)
+
+    def forward(self, bottom, top):
+        """
+        Load data.
+        """
+        for itt in range(self.batch_size):
+            # Use the batch loader to load the next image.
+            im, seg = self.batch_loader.load_next_image()
+
+            # Add directly to the caffe data layer
+            top[0].data[itt, ...] = im
+            top[1].data[itt, ...] = seg
+
+    def reshape(self, bottom, top):
+        """
+        There is no need to reshape the data, since the input is of fixed size
+        (rows and columns)
+        """
+        pass
+
+    def backward(self, top, propagate_down, bottom):
+        """
+        These layers does not back propagate
+        """
+        pass
 
 
 class BatchLoader(object):
