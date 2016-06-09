@@ -182,14 +182,14 @@ class BatchLoader(object):
             distance_map = np.sqrt(delta_x_map ** 2 + delta_y_map ** 2)
             cos_map = np.divide(delta_x_map, distance_map)
             sin_map = np.divide(delta_y_map, distance_map)
-            orientation_map[np.logical_and(cos_map > 0.5, sin_map > 0)] = 0
-            orientation_map[np.logical_and(cos_map > 0, sin_map > 0.5)] = 1
-            orientation_map[np.logical_and(cos_map < 0, sin_map > 0.5)] = 2
-            orientation_map[np.logical_and(cos_map < -0.5, sin_map > 0)] = 3
-            orientation_map[np.logical_and(cos_map < -0.5, sin_map < 0)] = 4
-            orientation_map[np.logical_and(cos_map < 0, sin_map < -0.5)] = 5
-            orientation_map[np.logical_and(cos_map > 0, sin_map < -0.5)] = 6
-            orientation_map[np.logical_and(cos_map > 0.5, sin_map < 0)] = 7
+            orientation_map[np.logical_and(cos_map > 0.5, sin_map >= 0)] = 1
+            orientation_map[np.logical_and(cos_map > 0, sin_map >= 0.5)] = 2
+            orientation_map[np.logical_and(cos_map <= 0, sin_map > 0.5)] = 3
+            orientation_map[np.logical_and(cos_map <= -0.5, sin_map > 0)] = 4
+            orientation_map[np.logical_and(cos_map < -0.5, sin_map <= 0)] = 5
+            orientation_map[np.logical_and(cos_map < 0, sin_map <= -0.5)] = 6
+            orientation_map[np.logical_and(cos_map >= 0, sin_map < -0.5)] = 7
+            orientation_map[np.logical_and(cos_map >= 0.5, sin_map < 0)] = 8
             label_map_org[seg == label] = orientation_map[seg == label]
             # centroids[label, :] /= 32
             # label_map_org[seg == label] = int(round(centroids[label, 0])) * 8 + int(
