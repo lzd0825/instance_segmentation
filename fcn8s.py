@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/home/yi/code/tools/caffe/python')
 import caffe
 from caffe import layers as L, params as P
 from caffe.coord_map import crop
@@ -16,10 +18,12 @@ def fcn(split):
     pydata_params = dict(split=split, mean=(104.00699, 116.66877, 122.67892),
             seed=1337)
     if split == 'train':
-        pydata_params['sbdd_dir'] = '../../data/sbdd/dataset'
+        #pydata_params['sbdd_dir'] = '../../data/sbdd/dataset'
+        pydata_params['sbdd_dir'] = '/media/yi/DATA/data-orig/sbd/dataset'
         pylayer = 'SBDDSegDataLayer'
     else:
-        pydata_params['voc_dir'] = '../../data/pascal/VOC2011'
+        #pydata_params['voc_dir'] = '../../data/pascal/VOC2011'
+        pydata_params['voc_dir'] = '/media/yi/DATA/data-orig/VOCdevkit/VOC2012'
         pylayer = 'VOCSegDataLayer'
     n.data, n.label = L.Python(module='voc_layers', layer=pylayer,
             ntop=2, param_str=str(pydata_params))
@@ -91,7 +95,8 @@ def make_net():
         f.write(str(fcn('train')))
 
     with open('val.prototxt', 'w') as f:
-        f.write(str(fcn('seg11valid')))
+        # f.write(str(fcn('seg11valid')))
+        f.write(str(fcn('val')))
 
 if __name__ == '__main__':
     make_net()
