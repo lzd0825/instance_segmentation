@@ -9,10 +9,11 @@ import os
 import setproctitle
 setproctitle.setproctitle(os.path.basename(os.getcwd()))
 
-weights = '../vgg16fc.caffemodel'
+# weights = '../vgg16fc.caffemodel'
+# weights = '../VGG_ILSVRC_16_layers.caffemodel'
+weights = '../VGG_ILSVRC_16_layers_conv.caffemodel'
 
 # init
-# caffe.set_device(int(sys.argv[1]))
 caffe.set_mode_gpu()
 caffe.set_device(1)
 

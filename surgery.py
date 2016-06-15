@@ -1,4 +1,6 @@
 from __future__ import division
+import sys
+sys.path.append('/home/yi/code/tools/caffe/python')
 import caffe
 import numpy as np
 
